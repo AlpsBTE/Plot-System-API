@@ -1,4 +1,5 @@
 use crate::{entities::*, pool::Db};
+use rocket::fs::TempFile;
 use rocket::{http::Status, serde::json::Json};
 use sea_orm::{ActiveValue::*, EntityTrait};
 use sea_orm_rocket::Connection;
@@ -54,4 +55,10 @@ pub async fn plot_add(
             };
         }
     };
+}
+
+#[post("/upload_test", data = "<file>")]
+pub async fn upload_test(mut file: TempFile<'_>) -> std::io::Result<()> {
+    print!("{:#?}", file.content_type());
+    file.persist_to("/file.txt").await
 }

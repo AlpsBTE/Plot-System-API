@@ -24,6 +24,7 @@ fn rocket() -> _ {
             routes::get::byte_arr,
             routes::post::plot_add,
             routes::put::set_pasted,
+            routes::post::upload_test,
         ],
     )
 }
