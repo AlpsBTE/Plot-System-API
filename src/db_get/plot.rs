@@ -1,18 +1,14 @@
-use sea_orm::{DatabaseConnection, PaginatorTrait, QueryFilter};
+use sea_orm::{DatabaseConnection, DbErr, PaginatorTrait, QueryFilter};
 
 use crate::entities::{prelude::*, *};
 
 use sea_orm::entity::*;
 
-pub async fn by_plot_id(db: &DatabaseConnection, plot_id: i32) -> plotsystem_plots::Model {
-    let plot = PlotsystemPlots::find_by_id(plot_id)
-        .one(db)
-        .await
-        .unwrap()
-        .unwrap()
-        .into();
-
-    return plot;
+pub async fn by_plot_id(
+    db: &DatabaseConnection,
+    plot_id: i32,
+) -> Result<Option<plotsystem_plots::Model>, DbErr> {
+    return PlotsystemPlots::find_by_id(plot_id).one(db).await;
 }
 
 pub async fn filtered(

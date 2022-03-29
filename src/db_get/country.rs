@@ -1,4 +1,4 @@
-use sea_orm::DatabaseConnection;
+use sea_orm::{DatabaseConnection, DbErr};
 
 use crate::entities::{prelude::*, *};
 
@@ -7,15 +7,8 @@ use sea_orm::entity::*;
 pub async fn by_country_id(
     db: &DatabaseConnection,
     country_id: i32,
-) -> plotsystem_countries::Model {
-    let country = PlotsystemCountries::find_by_id(country_id)
-        .one(db)
-        .await
-        .unwrap()
-        .unwrap()
-        .into();
-
-    return country;
+) -> Result<Option<plotsystem_countries::Model>, DbErr> {
+    return PlotsystemCountries::find_by_id(country_id).one(db).await;
 }
 
 pub async fn by_cp_id(db: &DatabaseConnection, cp_id: i32) -> plotsystem_countries::Model {

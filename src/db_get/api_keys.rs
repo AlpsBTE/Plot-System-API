@@ -1,6 +1,6 @@
 use std::process::exit;
 
-use sea_orm::{DatabaseConnection, QueryFilter};
+use sea_orm::{DatabaseConnection, DbErr, QueryFilter};
 
 use crate::entities::{prelude::*, *};
 
@@ -19,16 +19,16 @@ pub async fn api_key_exists(db: &DatabaseConnection, api_key: &str) -> bool {
     };
 }
 
-pub async fn by_plot_id(db: &DatabaseConnection, plot_id: i32) -> Vec<api_keys::Model> {
+pub async fn by_plot_id(
+    db: &DatabaseConnection,
+    plot_id: i32,
+) -> Result<Vec<api_keys::Model>, DbErr> {
     let country_id = super::country::by_plot_id(db, plot_id).await.id;
 
-    let api_keys = ApiKeys::find()
+    return ApiKeys::find()
         .filter(api_keys::Column::CountryId.eq(country_id))
         .all(db)
-        .await
-        .unwrap();
-
-    return api_keys;
+        .await;
 }
 
 pub async fn by_cp_id(db: &DatabaseConnection, cp_id: i32) -> Vec<api_keys::Model> {

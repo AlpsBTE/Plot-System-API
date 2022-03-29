@@ -1,4 +1,4 @@
-use sea_orm::DatabaseConnection;
+use sea_orm::{DatabaseConnection, DbErr};
 
 use crate::entities::{prelude::*, *};
 
@@ -7,17 +7,10 @@ use sea_orm::entity::*;
 pub async fn by_ftp_id(
     db: &DatabaseConnection,
     ftp_id: i32,
-) -> plotsystem_ftp_configurations::Model {
-    println!("{}", ftp_id);
-
-    let ftp = PlotsystemFtpConfigurations::find_by_id(ftp_id)
+) -> Result<Option<plotsystem_ftp_configurations::Model>, DbErr> {
+    return PlotsystemFtpConfigurations::find_by_id(ftp_id)
         .one(db)
-        .await
-        .unwrap()
-        .unwrap()
-        .into();
-
-    return ftp;
+        .await;
 }
 
 pub async fn by_server_id(
