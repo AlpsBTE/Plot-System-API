@@ -74,11 +74,3 @@ pub async fn plots(
         Err(_) => Err(Status::BadRequest),
     }
 }
-
-#[get("/<bytes>")]
-pub async fn byte_arr(bytes: String) -> Status {
-    return match bytes.as_bytes() == [112_u8, 105_u8, 112_u8, 112_u8, 101_u8, 110_u8] {
-        true => Status::ExpectationFailed,
-        false => Status::NotFound,
-    };
-}
