@@ -1,10 +1,7 @@
 use crate::auth::auth_preflag_request_guard::AuthPreflag;
 use crate::{db_get, entities::*, pool::Db};
 use rocket::Request;
-use rocket::{
-    http::Status, response, response::status, response::Responder, response::Response,
-    serde::json::Json,
-};
+use rocket::{http::Status, response, response::Responder, response::Response, serde::json::Json};
 use sea_orm::{ActiveValue::*, EntityTrait};
 use sea_orm_rocket::Connection;
 use serde::Deserialize;
@@ -60,7 +57,7 @@ pub async fn city_post(
     conn: Connection<'_, Db>,
     auth_preflag: AuthPreflag,
     city_json: Json<NewCityJson>,
-) -> Result<Status, APIResponse> {
+) -> Result<Status, APIResponse<String>> {
     let db = conn.into_inner();
 
     let AuthPreflag(api_key) = auth_preflag;
@@ -71,25 +68,19 @@ pub async fn city_post(
     } {
         true => {
             // check if user can use country being specified
-            if !city_json.country_id.is_none() {
-                match db_get::api_keys::country_related_to_api_key(
-                    db,
-                    &api_key,
-                    city_json.country_id.unwrap(),
-                )
+            match db_get::api_keys::country_related_to_api_key(db, &api_key, city_json.country_id)
                 .await
-                {
-                    Ok(country) => {
-                        if !country {
-                            return Err(APIResponse(
-                                Status::Unauthorized,
-                                Some("You don't have access to this country.".to_owned()),
-                            ));
-                        }
+            {
+                Ok(country) => {
+                    if !country {
+                        return Err(APIResponse(
+                            Status::Unauthorized,
+                            Some("You don't have access to this country.".to_owned()),
+                        ));
                     }
-                    Err(e) => return Err(APIResponse(Status::BadRequest, Some(e.to_string()))),
-                };
-            }
+                }
+                Err(e) => return Err(APIResponse(Status::BadRequest, Some(e.to_string()))),
+            };
 
             let city = plotsystem_city_projects::ActiveModel {
                 id: NotSet,

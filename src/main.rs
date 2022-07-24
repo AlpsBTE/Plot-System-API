@@ -19,6 +19,7 @@ fn rocket() -> _ {
             routes::cities::city_get,
             routes::cities::city_post,
             routes::cities::city_put,
+            routes::cities::city_delete,
             routes::get::ftp_configuration,
             // routes::get::city_project,
             routes::get::server,
