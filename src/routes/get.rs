@@ -24,21 +24,6 @@ pub async fn ftp_configuration(
     }
 }
 
-#[get("/city_project/<id>")]
-pub async fn city_project(
-    conn: Connection<'_, Db>,
-    _auth_preflag: AuthPreflag,
-    id: i32,
-) -> Result<Json<plotsystem_city_projects::Model>, Status> {
-    let db = conn.into_inner();
-
-    match db_get::city_project::by_cp_id(db, id).await {
-        Ok(cp) => Ok(Json(cp)),
-        // Return error message in status
-        Err(_) => Err(Status::BadRequest),
-    }
-}
-
 #[get("/city_projects")]
 pub async fn city_projects(
     conn: Connection<'_, Db>,

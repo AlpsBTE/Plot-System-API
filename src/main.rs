@@ -15,13 +15,16 @@ fn rocket() -> _ {
     rocket::build().attach(Db::init()).mount(
         "/api/v1",
         routes![
+            routes::cities::city_get,
+            routes::cities::city_post,
+            routes::cities::city_put,
             routes::get::ftp_configuration,
-            routes::get::city_project,
+            // routes::get::city_project,
             routes::get::city_projects,
             routes::get::server,
             routes::get::plot,
             routes::get::plots,
-            routes::get::byte_arr,
+            // routes::get::byte_arr,
             routes::post::plot_add,
             routes::put::set_pasted,
         ],
