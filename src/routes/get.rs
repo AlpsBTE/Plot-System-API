@@ -24,20 +24,6 @@ pub async fn ftp_configuration(
     }
 }
 
-#[get("/city_projects")]
-pub async fn city_projects(
-    conn: Connection<'_, Db>,
-    _auth_preflag: AuthPreflag,
-) -> Result<Json<Vec<plotsystem_city_projects::Model>>, Status> {
-    let db = conn.into_inner();
-
-    match db_get::city_project::all(db).await {
-        Ok(cp) => Ok(Json(cp)),
-        // Return error message in status
-        Err(_) => Err(Status::BadRequest),
-    }
-}
-
 #[get("/server/<id_type>/<id>")]
 pub async fn server(
     conn: Connection<'_, Db>,

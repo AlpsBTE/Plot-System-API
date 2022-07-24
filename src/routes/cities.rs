@@ -1,4 +1,4 @@
-use crate::auth::{auth_get_ftp_config_guard::FtpAuth, auth_preflag_request_guard::AuthPreflag};
+use crate::auth::auth_preflag_request_guard::AuthPreflag;
 use crate::{db_get, entities::*, pool::Db};
 use rocket::Request;
 use rocket::{
@@ -9,6 +9,24 @@ use sea_orm::{ActiveValue::*, EntityTrait};
 use sea_orm_rocket::Connection;
 use serde::Deserialize;
 
+// get all city projects
+// no auth is required for this api request
+#[get("/city_projects")]
+pub async fn city_get_all(
+    conn: Connection<'_, Db>,
+    _auth_preflag: AuthPreflag,
+) -> Result<Json<Vec<plotsystem_city_projects::Model>>, Status> {
+    let db = conn.into_inner();
+
+    match db_get::city_project::all(db).await {
+        Ok(cp) => Ok(Json(cp)),
+        // Return error message in status
+        Err(_) => Err(Status::BadRequest),
+    }
+}
+
+// get specific city project
+// no auth is required
 #[get("/city_project/<id>")]
 pub async fn city_get(
     conn: Connection<'_, Db>,
@@ -33,21 +51,46 @@ pub struct NewCityJson {
     pub visible: bool,
 }
 
+// create a new city project
+// requires valid api key
+// all city fields are required except ID, as it's automatically assigned here
+// api key has to be associated with the country for it to save
 #[post("/city_project", format = "json", data = "<city_json>")]
 pub async fn city_post(
     conn: Connection<'_, Db>,
     auth_preflag: AuthPreflag,
     city_json: Json<NewCityJson>,
-) -> Result<Status, status::BadRequest<String>> {
+) -> Result<Status, APIResponse> {
     let db = conn.into_inner();
 
     let AuthPreflag(api_key) = auth_preflag;
 
     match match db_get::api_keys::api_key_exists(db, &api_key).await {
         Ok(cp) => cp,
-        Err(e) => return Err(status::BadRequest(Some(e.to_string()))),
+        Err(e) => return Err(APIResponse(Status::BadRequest, Some(e.to_string()))),
     } {
         true => {
+            // check if user can use country being specified
+            if !city_json.country_id.is_none() {
+                match db_get::api_keys::country_related_to_api_key(
+                    db,
+                    &api_key,
+                    city_json.country_id.unwrap(),
+                )
+                .await
+                {
+                    Ok(country) => {
+                        if !country {
+                            return Err(APIResponse(
+                                Status::Unauthorized,
+                                Some("You don't have access to this country.".to_owned()),
+                            ));
+                        }
+                    }
+                    Err(e) => return Err(APIResponse(Status::BadRequest, Some(e.to_string()))),
+                };
+            }
+
             let city = plotsystem_city_projects::ActiveModel {
                 id: NotSet,
                 country_id: Set(city_json.country_id.to_owned()),
@@ -61,7 +104,7 @@ pub async fn city_post(
                 .await
             {
                 Ok(_) => Ok(Status::Ok),
-                Err(e) => Err(status::BadRequest(Some(e.to_string()))),
+                Err(e) => Err(APIResponse(Status::BadRequest, Some(e.to_string()))),
             }
         }
         false => Ok(Status::Unauthorized),
@@ -90,6 +133,9 @@ impl<'r, 'o: 'r, R: Responder<'r, 'o>> Responder<'r, 'o> for APIResponse<R> {
     }
 }
 
+// modifies city project
+// requires valid api key that has access to this city project
+// api key has to be associated with the country for it to save
 #[put("/city_project/<id>", format = "json", data = "<city_json>")]
 pub async fn city_put(
     conn: Connection<'_, Db>,
@@ -101,7 +147,8 @@ pub async fn city_put(
 
     let AuthPreflag(api_key) = auth_preflag;
 
-    match match db_get::api_keys::cp_related_to_api_key(db, &api_key, &id).await {
+    // check if the city being edited can be modified by user
+    match match db_get::api_keys::cp_related_to_api_key(db, &api_key, id).await {
         Ok(cp) => cp,
         Err(e) => return Err(APIResponse(Status::BadRequest, Some(e.to_string()))), //status::BadRequest(Some(e.to_string()))
     } {
@@ -111,6 +158,27 @@ pub async fn city_put(
                     Ok(city) => city.into(),
                     Err(e) => return Err(APIResponse(Status::BadRequest, Some(e.to_string()))), //status::BadRequest(Some(e.to_string()))
                 };
+
+            // if modifying city project's country; check if user has access to said country
+            if !city_json.country_id.is_none() {
+                match db_get::api_keys::country_related_to_api_key(
+                    db,
+                    &api_key,
+                    city_json.country_id.unwrap(),
+                )
+                .await
+                {
+                    Ok(country) => {
+                        if !country {
+                            return Err(APIResponse(
+                                Status::Unauthorized,
+                                Some("You don't have access to this country.".to_owned()),
+                            ));
+                        }
+                    }
+                    Err(e) => return Err(APIResponse(Status::BadRequest, Some(e.to_string()))),
+                };
+            }
 
             let mut modified = false;
 
@@ -150,6 +218,8 @@ pub async fn city_put(
     }
 }
 
+// deletes a city project
+// api key has to be associated with this city project to delete it
 #[delete("/city_project/<id>")]
 pub async fn city_delete(
     conn: Connection<'_, Db>,
@@ -159,12 +229,12 @@ pub async fn city_delete(
     let db = conn.into_inner();
     let AuthPreflag(api_key) = auth_preflag;
 
-    match match db_get::api_keys::cp_related_to_api_key(db, &api_key, &id).await {
+    match match db_get::api_keys::cp_related_to_api_key(db, &api_key, id).await {
         Ok(cp) => cp,
         Err(e) => return Err(APIResponse(Status::BadRequest, Some(e.to_string()))),
     } {
         true => {
-            let mut city: plotsystem_city_projects::ActiveModel =
+            let city: plotsystem_city_projects::ActiveModel =
                 match db_get::city_project::by_cp_id(db, id).await {
                     Ok(city) => city.into(),
                     Err(e) => return Err(APIResponse(Status::BadRequest, Some(e.to_string()))),
