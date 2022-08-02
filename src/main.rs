@@ -22,6 +22,8 @@ fn rocket() -> _ {
             routes::cities::city_delete,
             routes::builders::builders_get_all,
             routes::builders::builders_get,
+            routes::countries::country_get_all,
+            routes::countries::country_get,
             routes::get::ftp_configuration,
             // routes::get::city_project,
             routes::get::server,
