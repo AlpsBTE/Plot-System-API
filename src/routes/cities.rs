@@ -1,4 +1,5 @@
 use crate::auth::auth_preflag_request_guard::AuthPreflag;
+use crate::entities::{prelude::*, *};
 use crate::{db_get, entities::*, pool::Db};
 use rocket::Request;
 use rocket::{http::Status, response, response::Responder, response::Response, serde::json::Json};
@@ -11,7 +12,6 @@ use serde::Deserialize;
 #[get("/city_projects")]
 pub async fn city_get_all(
     conn: Connection<'_, Db>,
-    _auth_preflag: AuthPreflag,
 ) -> Result<Json<Vec<plotsystem_city_projects::Model>>, Status> {
     let db = conn.into_inner();
 
@@ -27,7 +27,6 @@ pub async fn city_get_all(
 #[get("/city_project/<id>")]
 pub async fn city_get(
     conn: Connection<'_, Db>,
-    _auth_preflag: AuthPreflag,
     id: i32,
 ) -> Result<Json<plotsystem_city_projects::Model>, Status> {
     let db = conn.into_inner();
@@ -57,7 +56,7 @@ pub async fn city_post(
     conn: Connection<'_, Db>,
     auth_preflag: AuthPreflag,
     city_json: Json<NewCityJson>,
-) -> Result<Status, APIResponse<String>> {
+) -> Result<APIResponse<Json<plotsystem_city_projects::Model>>, APIResponse<String>> {
     let db = conn.into_inner();
 
     let AuthPreflag(api_key) = auth_preflag;
@@ -90,15 +89,26 @@ pub async fn city_post(
                 visible: Set(city_json.visible.to_owned()),
             };
 
+            // Ok(APIResponse(Status::Ok, None))
+
             match plotsystem_city_projects::Entity::insert(city)
                 .exec(db)
                 .await
             {
-                Ok(_) => Ok(Status::Ok),
+                Ok(result) => match PlotsystemCityProjects::find_by_id(result.last_insert_id)
+                    .one(db)
+                    .await
+                {
+                    Ok(city) => Ok(APIResponse(Status::Ok, Some(Json(city.unwrap())))),
+                    Err(e) => Err(APIResponse(
+                        Status::InternalServerError,
+                        Some(e.to_string()),
+                    )),
+                },
                 Err(e) => Err(APIResponse(Status::BadRequest, Some(e.to_string()))),
             }
         }
-        false => Ok(Status::Unauthorized),
+        false => Ok(APIResponse(Status::Unauthorized, None)),
     }
 }
 
