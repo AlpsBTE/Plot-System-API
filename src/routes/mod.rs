@@ -4,5 +4,3 @@ pub mod countries;
 pub mod ftp;
 pub mod get;
 pub mod plots;
-pub mod post;
-pub mod put;

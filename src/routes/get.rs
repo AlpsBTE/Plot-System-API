@@ -21,35 +21,3 @@ pub async fn server(
         Err(_) => Err(Status::BadRequest),
     }
 }
-
-#[get("/plot/<plot_id>")]
-pub async fn plot(
-    conn: Connection<'_, Db>,
-    _auth_preflag: AuthPreflag,
-    plot_id: i32,
-) -> Result<Json<plotsystem_plots::Model>, Status> {
-    let db = conn.into_inner();
-
-    match db_get::plot::by_plot_id(db, plot_id).await {
-        Ok(plot) => Ok(Json(plot)),
-        // Return error message in status
-        Err(_) => Err(Status::BadRequest),
-    }
-}
-
-#[get("/plots?<status>&<pasted>&<limit>")]
-pub async fn plots(
-    conn: Connection<'_, Db>,
-    _auth_preflag: AuthPreflag,
-    status: Option<sea_orm_active_enums::Status>,
-    pasted: Option<bool>,
-    limit: Option<u32>,
-) -> Result<Json<Vec<plotsystem_plots::Model>>, Status> {
-    let db = conn.into_inner();
-
-    match db_get::plot::filtered(db, status, pasted, limit).await {
-        Ok(plots) => Ok(Json(plots)),
-        // Return error message in status
-        Err(_) => Err(Status::BadRequest),
-    }
-}

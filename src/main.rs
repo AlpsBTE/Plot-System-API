@@ -27,14 +27,16 @@ fn rocket() -> _ {
             routes::ftp::ftp_get,
             routes::plots::plot_get,
             routes::plots::plots_get,
+            routes::plots::plot_add,
+            routes::plots::set_pasted,
             // routes::get::ftp_configuration,
             // routes::get::city_project,
             routes::get::server,
             // routes::get::plot,
             // routes::get::plots,
             // routes::get::byte_arr,
-            routes::post::plot_add,
-            routes::put::set_pasted,
+            // routes::post::plot_add,
+            // routes::put::set_pasted,
         ],
     )
 }
