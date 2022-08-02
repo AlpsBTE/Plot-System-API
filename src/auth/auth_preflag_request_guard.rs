@@ -25,21 +25,28 @@ impl<'r> FromRequest<'r> for AuthPreflag {
             .get(0)
         {
             Some(key) => key.to_string(),
-            None => return Outcome::Failure((Status::BadRequest, AuthError::Missing)),
+
+            // 401 Unauthorized is sent due to that status code being used to signify you don't have authorization in your request
+            // None => return Outcome::Failure((Status::BadRequest, AuthError::Missing)),
+            None => return Outcome::Failure((Status::Unauthorized, AuthError::Missing)),
         };
 
         let db = match req.guard::<Connection<'_, Db>>().await {
             Success(db) => db.into_inner(),
+
+            // 403 Forbidden is sent due to that status code being used to signify you don't have permission
+            // _ => return Outcome::Failure((Status::BadRequest, AuthError::Invalid)),
             _ => return Outcome::Failure((Status::BadRequest, AuthError::Invalid)),
         };
 
         match match crate::db_get::api_keys::api_key_exists(db, &api_key).await {
             Ok(exists) => exists,
             Err(e) => {
+                // 500 Internal Server Error is sent because of a database error
                 return Outcome::Failure((
-                    Status::BadRequest,
+                    Status::InternalServerError,
                     AuthError::DataBaseError(e.to_string()),
-                ))
+                ));
             }
         } {
             true => Outcome::Success(AuthPreflag(api_key)),
