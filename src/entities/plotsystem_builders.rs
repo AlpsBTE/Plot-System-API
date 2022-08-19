@@ -11,9 +11,9 @@ pub struct Model {
     pub name: String,
     pub score: i32,
     pub completed_plots: i32,
-    pub first_slot_id: Option<i32>,
-    pub second_slot_id: Option<i32>,
-    pub third_slot_id: Option<i32>,
+    pub first_slot: Option<i32>,
+    pub second_slot: Option<i32>,
+    pub third_slot: Option<i32>,
     pub lang: Option<String>,
 }
 
@@ -21,7 +21,7 @@ pub struct Model {
 pub enum Relation {
     #[sea_orm(
         belongs_to = "super::plotsystem_plots::Entity",
-        from = "Column::FirstSlotId",
+        from = "Column::FirstSlot",
         to = "super::plotsystem_plots::Column::Id",
         on_update = "Restrict",
         on_delete = "Restrict"
@@ -29,7 +29,7 @@ pub enum Relation {
     PlotsystemPlots3,
     #[sea_orm(
         belongs_to = "super::plotsystem_plots::Entity",
-        from = "Column::SecondSlotId",
+        from = "Column::SecondSlot",
         to = "super::plotsystem_plots::Column::Id",
         on_update = "Restrict",
         on_delete = "Restrict"
@@ -37,7 +37,7 @@ pub enum Relation {
     PlotsystemPlots2,
     #[sea_orm(
         belongs_to = "super::plotsystem_plots::Entity",
-        from = "Column::ThirdSlotId",
+        from = "Column::ThirdSlot",
         to = "super::plotsystem_plots::Column::Id",
         on_update = "Restrict",
         on_delete = "Restrict"

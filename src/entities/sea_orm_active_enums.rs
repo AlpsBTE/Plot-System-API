@@ -24,16 +24,16 @@ pub enum Status {
 )]
 #[sea_orm(rs_type = "String", db_type = "Enum", enum_name = "continent")]
 pub enum Continent {
-    #[sea_orm(string_value = "Europe")]
+    #[sea_orm(string_value = "europe")]
     Europe,
-    #[sea_orm(string_value = "Asia")]
+    #[sea_orm(string_value = "asia")]
     Asia,
-    #[sea_orm(string_value = "Africa")]
+    #[sea_orm(string_value = "africa")]
     Africa,
-    #[sea_orm(string_value = "Oceania")]
+    #[sea_orm(string_value = "oceania")]
     Oceania,
-    #[sea_orm(string_value = "South America")]
+    #[sea_orm(string_value = "south america")]
     SouthAmerica,
-    #[sea_orm(string_value = "North America")]
+    #[sea_orm(string_value = "north america")]
     NorthAmerica,
 }

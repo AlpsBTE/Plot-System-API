@@ -15,6 +15,38 @@ pub async fn api_key_exists(db: &DatabaseConnection, api_key: &str) -> Result<bo
     }
 }
 
+pub async fn country_related_to_api_key(
+    db: &DatabaseConnection,
+    api_key: &String,
+    country_id: i32,
+) -> Result<bool, DbErr> {
+    match plotsystem_api_keys::Entity::find()
+        .join(
+            JoinType::InnerJoin,
+            plotsystem_api_keys::Relation::PlotsystemBuildteams.def(),
+        )
+        .join(
+            JoinType::InnerJoin,
+            plotsystem_buildteams::Relation::PlotsystemBuildteamHasCountries.def(),
+        )
+        .join(
+            JoinType::InnerJoin,
+            plotsystem_buildteam_has_countries::Relation::PlotsystemCountries.def(),
+        )
+        .filter(
+            Condition::all()
+                .add(plotsystem_api_keys::Column::ApiKey.eq(api_key.to_owned()))
+                .add(plotsystem_countries::Column::Id.eq(country_id)),
+        )
+        .all(db)
+        .await?
+        .len()
+    {
+        0 => Ok(false),
+        _ => Ok(true),
+    }
+}
+
 pub async fn cp_related_to_api_key(
     db: &DatabaseConnection,
     api_key: &String,

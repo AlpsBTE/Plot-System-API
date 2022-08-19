@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
-    pub schematic_path: Option<String>,
+    pub schematics_path: Option<String>,
     pub address: String,
     pub port: i32,
     #[sea_orm(column_name = "isSFTP")]
