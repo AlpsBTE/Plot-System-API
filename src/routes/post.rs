@@ -49,7 +49,7 @@ pub async fn plot_add(
                 last_activity: NotSet,
                 create_date: NotSet,
                 create_player: Set(plot_json.create_player.to_owned()),
-                pasted: Set(0),
+                pasted: Set(false),
                 outline: Set(Some(plot_json.outline.to_owned())),
             };
 

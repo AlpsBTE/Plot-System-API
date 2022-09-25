@@ -12,7 +12,7 @@ pub async fn set_pasted(
     _auth_preflag: AuthPreflag,
     _auth: AuthPutGuard,
     plot_id: i32,
-    pasted: i8,
+    pasted: bool,
 ) -> Status {
     let db = conn.into_inner();
 

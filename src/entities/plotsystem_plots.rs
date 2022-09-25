@@ -20,7 +20,7 @@ pub struct Model {
     pub score: Option<i32>,
     pub last_activity: Option<DateTime>,
     pub create_date: DateTime,
-    pub pasted: i8,
+    pub pasted: bool,
     #[sea_orm(column_type = "Custom(\"LONGTEXT\".to_owned())", nullable)]
     pub outline: Option<String>,
 }
