@@ -12,7 +12,7 @@ pub struct Model {
     pub address: String,
     pub port: i32,
     #[sea_orm(column_name = "isSFTP")]
-    pub is_sftp: i8,
+    pub is_sftp: bool,
     pub username: String,
     pub password: String,
 }
