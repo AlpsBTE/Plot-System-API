@@ -12,7 +12,7 @@ pub struct Model {
     pub rating: String,
     pub feedback: String,
     pub review_date: DateTime,
-    pub sent: i8,
+    pub sent: bool,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
