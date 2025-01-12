@@ -11,7 +11,7 @@ public partial class CityProject
 
     public string ServerName { get; set; } = null!;
 
-    public sbyte IsVisible { get; set; }
+    public bool IsVisible { get; set; }
 
     public virtual Country CountryCodeNavigation { get; set; } = null!;
 
