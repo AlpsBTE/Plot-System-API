@@ -6,13 +6,13 @@ namespace PlotSystem_API.Services;
 
 public class CityProjectRepositorySql(PlotSystemContext context) : ICityProjectRepository
 {
-    public List<CityProjectDto> GetCityProjects()
+    public List<CityProjectDto> GetCityProjects(BuildTeam buildTeam)
     {
         var cities = context.CityProjects
+            .Where(c => c.BuildTeams.FirstOrDefault(b => b.BuildTeamId == buildTeam.BuildTeamId) != null)
             .Include(cityProject => cityProject.CountryCodeNavigation)
             .ToList();
         
-        // TODO: only return cities that the build team actually owns (api key required)
         return cities.Select(city => new CityProjectDto()
             {
                 Id = city.CityProjectId,

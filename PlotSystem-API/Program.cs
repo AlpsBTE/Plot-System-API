@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using PlotSystem_API;
 using PlotSystem_API.Models;
 using PlotSystem_API.Services;
 
@@ -39,6 +40,10 @@ var app = builder.Build();
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors();
+
+app.UseMiddleware<ApiKeyMiddleware>();
+app.UseAuthorization();
+
 app.MapControllers();
 
 app.Run();
