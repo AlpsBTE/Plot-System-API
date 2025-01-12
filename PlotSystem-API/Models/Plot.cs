@@ -23,7 +23,7 @@ public partial class Plot
 
     public DateTime? LastActivityDate { get; set; }
 
-    public sbyte IsPasted { get; set; }
+    public bool IsPasted { get; set; }
 
     public string? McVersion { get; set; }
 

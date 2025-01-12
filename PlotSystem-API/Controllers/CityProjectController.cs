@@ -8,7 +8,7 @@ namespace PlotSystem_API.Controllers;
 [ApiController]
 public class CityProjectController(ICityProjectRepository repository) : ControllerBase
 {
-    // api/cityproject/
+    // GET: api/cityproject/
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public ActionResult<IEnumerable<CityProjectDto>> GetCityProjects()
@@ -17,7 +17,7 @@ public class CityProjectController(ICityProjectRepository repository) : Controll
         return Ok(cities);
     }
     
-    // api/cityproject/{id}
+    // GET: api/cityproject/{id}
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
