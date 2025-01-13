@@ -17,9 +17,10 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddControllers();
 
-var connectionString = builder.Environment.IsDevelopment() 
-    ? "data source=localhost;initial catalog=plotsystem_v2;user id=root"
-    : Environment.GetEnvironmentVariable("PLOTSYSTEM_DB_CONNECTION_STRING");
+Console.WriteLine("Plot System API running on production? " + builder.Environment.IsProduction());
+var connectionString = builder.Environment.IsProduction() 
+    ? Environment.GetEnvironmentVariable("PLOTSYSTEM_DB_CONNECTION_STRING")
+    : "data source=localhost;initial catalog=plotsystem_v2;user id=root";
 
 builder.Services.AddDbContextPool<PlotSystemContext>(options =>
     options.UseMySql(connectionString,
