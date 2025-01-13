@@ -10,14 +10,6 @@ namespace PlotSystem_API.Controllers;
 [ApiController]
 public class CityProjectController(ICityProjectRepository repository) : ControllerBase
 {
-    [HttpGet("test")]
-    public ActionResult Test()
-    {
-        var bt =  HttpContext.GetBuildTeam();
-        if (bt == null) return NotFound();
-        return Ok("logged in as" + bt.Name);
-    }
-    
     // GET: api/cityproject/
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
