@@ -17,7 +17,7 @@ namespace PlotSystem_API.Services
                     Status = plot.Status,
                     McVersion = plot.McVersion,
                     PlotVersion = plot.PlotVersion,
-                    completedSchematic = plot.CompleteSchematic
+                    CompletedSchematic = plot.CompleteSchematic
                 };
         }
 
@@ -65,7 +65,7 @@ namespace PlotSystem_API.Services
                     Status = plot.Status,
                     McVersion = plot.McVersion,
                     PlotVersion = plot.PlotVersion,
-                    completedSchematic = plot.CompleteSchematic
+                    CompletedSchematic = plot.CompleteSchematic
                 })
                 .ToList();
         }
