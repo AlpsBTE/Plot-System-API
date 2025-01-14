@@ -37,8 +37,6 @@ builder.Services.AddScoped<IPlotRepository, PlotRepositorySql>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors();
 
