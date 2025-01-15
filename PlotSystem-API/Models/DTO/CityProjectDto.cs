@@ -7,5 +7,6 @@
         public bool IsVisible { get; set; }
         public string Material { get; set; }
         public string? CustomModelData { get; set; }
+        public string ServerName { get; set; }
     }
 }

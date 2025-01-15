@@ -10,6 +10,7 @@ public class PlotController(IPlotRepository repository) : ControllerBase
 {
     // POST: api/plot
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     public ActionResult<PlotDto> CreatePlot(
         [FromForm] string cityProjectId, 
         [FromForm] string difficultyId, 
@@ -24,12 +25,13 @@ public class PlotController(IPlotRepository repository) : ControllerBase
             initialSchematicBytes = memoryStream.ToArray();
         }
 
-        return repository.CreatePlot(
+        return CreatedAtAction(nameof(GetPlotById), repository.CreatePlot(
             cityProjectId,
+            difficultyId,
             outlineBounds,
             createdBy,
             initialSchematicBytes
-        );
+        ));
     }
     
     // GET: api/plot/toPaste

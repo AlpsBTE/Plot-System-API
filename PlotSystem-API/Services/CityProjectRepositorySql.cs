@@ -19,7 +19,8 @@ public class CityProjectRepositorySql(PlotSystemContext context) : ICityProjectR
                 CountryCode = city.CountryCode,
                 IsVisible = city.IsVisible,
                 Material = city.CountryCodeNavigation.Material,
-                CustomModelData = city.CountryCodeNavigation.CustomModelData
+                CustomModelData = city.CountryCodeNavigation.CustomModelData,
+                ServerName = city.ServerName,
             })
             .ToList();
     }
@@ -37,7 +38,8 @@ public class CityProjectRepositorySql(PlotSystemContext context) : ICityProjectR
                 CountryCode = city.CountryCode,
                 IsVisible = city.IsVisible,
                 Material = city.CountryCodeNavigation.Material,
-                CustomModelData = city.CountryCodeNavigation.CustomModelData
+                CustomModelData = city.CountryCodeNavigation.CustomModelData,
+                ServerName = city.ServerName,
             };
     }
 }

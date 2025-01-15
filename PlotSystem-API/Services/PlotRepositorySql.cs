@@ -21,11 +21,12 @@ namespace PlotSystem_API.Services
                 };
         }
 
-        public PlotDto CreatePlot(string cityProjectId, string outlineBounds, string createPlayerUuid, byte[] initialSchematic)
+        public PlotDto CreatePlot(string cityProjectId, string difficultyId, string outlineBounds, string createPlayerUuid, byte[] initialSchematic)
         {
             var newPlot = new Plot()
             {
                 CityProjectId = cityProjectId,
+                DifficultyId = difficultyId,
                 OutlineBounds = outlineBounds,
                 CreatedBy = createPlayerUuid,
                 InitialSchematic = initialSchematic,
