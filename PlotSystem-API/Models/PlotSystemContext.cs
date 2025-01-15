@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using Pomelo.EntityFrameworkCore.MySql.Scaffolding.Internal;
 
 namespace PlotSystem_API.Models;
 
@@ -30,6 +33,8 @@ public partial class PlotSystemContext : DbContext
     public virtual DbSet<PlotReview> PlotReviews { get; set; }
 
     public virtual DbSet<Server> Servers { get; set; }
+
+    public virtual DbSet<SystemInfo> SystemInfos { get; set; }
 
     public virtual DbSet<Tutorial> Tutorials { get; set; }
     
@@ -392,6 +397,27 @@ public partial class PlotSystemContext : DbContext
                 .HasForeignKey(d => d.BuildTeamId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("server_ibfk_1");
+        });
+
+        modelBuilder.Entity<SystemInfo>(entity =>
+        {
+            entity.HasKey(e => e.SystemId).HasName("PRIMARY");
+
+            entity.ToTable("system_info");
+
+            entity.Property(e => e.SystemId)
+                .HasColumnType("int(11)")
+                .HasColumnName("system_id");
+            entity.Property(e => e.CurrentPlotVersion).HasColumnName("current_plot_version");
+            entity.Property(e => e.DbVersion).HasColumnName("db_version");
+            entity.Property(e => e.Description)
+                .HasColumnType("text")
+                .HasColumnName("description");
+            entity.Property(e => e.LastUpdate)
+                .ValueGeneratedOnAddOrUpdate()
+                .HasDefaultValueSql("current_timestamp()")
+                .HasColumnType("timestamp")
+                .HasColumnName("last_update");
         });
 
         modelBuilder.Entity<Tutorial>(entity =>

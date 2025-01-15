@@ -23,6 +23,7 @@ namespace PlotSystem_API.Services
 
         public PlotDto CreatePlot(string cityProjectId, string difficultyId, string outlineBounds, string createPlayerUuid, byte[] initialSchematic)
         {
+            var plotVersion = context.SystemInfos.First().CurrentPlotVersion;
             var newPlot = new Plot()
             {
                 CityProjectId = cityProjectId,
@@ -30,6 +31,7 @@ namespace PlotSystem_API.Services
                 OutlineBounds = outlineBounds,
                 CreatedBy = createPlayerUuid,
                 InitialSchematic = initialSchematic,
+                PlotVersion = plotVersion
             };
             var entity = context.Plots.Add(newPlot);
             var newPlotId = entity.Entity.PlotId;
