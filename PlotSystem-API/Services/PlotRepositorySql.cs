@@ -34,9 +34,9 @@ namespace PlotSystem_API.Services
                 PlotVersion = plotVersion
             };
             var entity = context.Plots.Add(newPlot);
-            var newPlotId = entity.Entity.PlotId;
             context.SaveChanges();
-
+            var newPlotId = newPlot.PlotId;
+            
             return new PlotDto()
             {
                 Id = newPlotId,
