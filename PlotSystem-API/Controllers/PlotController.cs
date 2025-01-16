@@ -11,7 +11,7 @@ public class PlotController(IPlotRepository repository) : ControllerBase
     // POST: api/plot
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public ActionResult<PlotDto> CreatePlot(
+    public ActionResult<int> CreatePlot(
         [FromForm] string cityProjectId, 
         [FromForm] string difficultyId, 
         [FromForm] string outlineBounds,
