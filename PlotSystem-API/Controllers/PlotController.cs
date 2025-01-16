@@ -25,13 +25,13 @@ public class PlotController(IPlotRepository repository) : ControllerBase
             initialSchematicBytes = memoryStream.ToArray();
         }
 
-        return CreatedAtAction(nameof(GetPlotById), repository.CreatePlot(
+        return Ok(repository.CreatePlot(
             cityProjectId,
             difficultyId,
             outlineBounds,
             createdBy,
             initialSchematicBytes
-        ));
+        ).Id);
     }
     
     // GET: api/plot/toPaste
