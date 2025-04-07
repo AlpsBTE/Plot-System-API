@@ -11,7 +11,7 @@ public class PlotController(IPlotRepository repository) : ControllerBase
     // POST: api/plot
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public ActionResult<int> CreatePlot(
+    public ActionResult<PlotDto> CreatePlot(
         [FromForm] string cityProjectId, 
         [FromForm] string difficultyId, 
         [FromForm] string outlineBounds,
@@ -31,7 +31,7 @@ public class PlotController(IPlotRepository repository) : ControllerBase
             outlineBounds,
             createdBy,
             initialSchematicBytes
-        ).Id);
+        ));
     }
     
     // GET: api/plot/toPaste
