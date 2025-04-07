@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PlotSystem_API.Extensions;
-using PlotSystem_API.Models;
 using PlotSystem_API.Models.DTO;
 using PlotSystem_API.Services;
 

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-using Pomelo.EntityFrameworkCore.MySql.Scaffolding.Internal;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace PlotSystem_API.Models;
 
@@ -20,8 +17,6 @@ public partial class PlotSystemContext : DbContext
 
     public virtual DbSet<Builder> Builders { get; set; }
 
-    public virtual DbSet<BuilderHasPlot> BuilderHasPlots { get; set; }
-
     public virtual DbSet<CityProject> CityProjects { get; set; }
 
     public virtual DbSet<Country> Countries { get; set; }
@@ -31,6 +26,8 @@ public partial class PlotSystemContext : DbContext
     public virtual DbSet<PlotDifficulty> PlotDifficulties { get; set; }
 
     public virtual DbSet<PlotReview> PlotReviews { get; set; }
+
+    public virtual DbSet<ReviewToggleCriterion> ReviewToggleCriteria { get; set; }
 
     public virtual DbSet<Server> Servers { get; set; }
 
@@ -63,50 +60,26 @@ public partial class PlotSystemContext : DbContext
                 .HasMaxLength(255)
                 .HasColumnName("name");
 
-            entity.HasMany(d => d.CityProjects).WithMany(p => p.BuildTeams)
+            entity.HasMany(d => d.CriteriaNames).WithMany(p => p.BuildTeams)
                 .UsingEntity<Dictionary<string, object>>(
-                    "BuildTeamHasCityProject",
-                    r => r.HasOne<CityProject>().WithMany()
-                        .HasForeignKey("CityProjectId")
-                        .HasConstraintName("build_team_has_city_project_ibfk_2"),
+                    "BuildTeamUsesToggleCriterion",
+                    r => r.HasOne<ReviewToggleCriterion>().WithMany()
+                        .HasForeignKey("CriteriaName")
+                        .HasConstraintName("build_team_uses_toggle_criteria_ibfk_2"),
                     l => l.HasOne<BuildTeam>().WithMany()
                         .HasForeignKey("BuildTeamId")
-                        .HasConstraintName("build_team_has_city_project_ibfk_1"),
+                        .HasConstraintName("build_team_uses_toggle_criteria_ibfk_1"),
                     j =>
                     {
-                        j.HasKey("BuildTeamId", "CityProjectId")
+                        j.HasKey("BuildTeamId", "CriteriaName")
                             .HasName("PRIMARY")
                             .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
-                        j.ToTable("build_team_has_city_project");
-                        j.HasIndex(new[] { "CityProjectId" }, "city_project_id");
+                        j.ToTable("build_team_uses_toggle_criteria");
+                        j.HasIndex(new[] { "CriteriaName" }, "criteria_name");
                         j.IndexerProperty<int>("BuildTeamId")
                             .HasColumnType("int(11)")
                             .HasColumnName("build_team_id");
-                        j.IndexerProperty<string>("CityProjectId").HasColumnName("city_project_id");
-                    });
-
-            entity.HasMany(d => d.CountryCodes).WithMany(p => p.BuildTeams)
-                .UsingEntity<Dictionary<string, object>>(
-                    "BuildTeamHasCountry",
-                    r => r.HasOne<Country>().WithMany()
-                        .HasForeignKey("CountryCode")
-                        .HasConstraintName("build_team_has_country_ibfk_2"),
-                    l => l.HasOne<BuildTeam>().WithMany()
-                        .HasForeignKey("BuildTeamId")
-                        .HasConstraintName("build_team_has_country_ibfk_1"),
-                    j =>
-                    {
-                        j.HasKey("BuildTeamId", "CountryCode")
-                            .HasName("PRIMARY")
-                            .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
-                        j.ToTable("build_team_has_country");
-                        j.HasIndex(new[] { "CountryCode" }, "country_code");
-                        j.IndexerProperty<int>("BuildTeamId")
-                            .HasColumnType("int(11)")
-                            .HasColumnName("build_team_id");
-                        j.IndexerProperty<string>("CountryCode")
-                            .HasMaxLength(2)
-                            .HasColumnName("country_code");
+                        j.IndexerProperty<string>("CriteriaName").HasColumnName("criteria_name");
                     });
 
             entity.HasMany(d => d.Uus).WithMany(p => p.BuildTeams)
@@ -140,15 +113,15 @@ public partial class PlotSystemContext : DbContext
 
             entity.ToTable("builder");
 
+            entity.HasIndex(e => e.Name, "name").IsUnique();
+
             entity.Property(e => e.Uuid)
                 .HasMaxLength(36)
                 .HasColumnName("uuid");
             entity.Property(e => e.FirstSlot)
                 .HasColumnType("int(11)")
                 .HasColumnName("first_slot");
-            entity.Property(e => e.Name)
-                .HasMaxLength(255)
-                .HasColumnName("name");
+            entity.Property(e => e.Name).HasColumnName("name");
             entity.Property(e => e.PlotType)
                 .HasColumnType("int(11)")
                 .HasColumnName("plot_type");
@@ -163,65 +136,46 @@ public partial class PlotSystemContext : DbContext
                 .HasColumnName("third_slot");
         });
 
-        modelBuilder.Entity<BuilderHasPlot>(entity =>
-        {
-            entity.HasKey(e => new { e.PlotId, e.Uuid })
-                .HasName("PRIMARY")
-                .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
-
-            entity.ToTable("builder_has_plot");
-
-            entity.HasIndex(e => e.Uuid, "uuid");
-
-            entity.Property(e => e.PlotId)
-                .HasColumnType("int(11)")
-                .HasColumnName("plot_id");
-            entity.Property(e => e.Uuid)
-                .HasMaxLength(36)
-                .HasColumnName("uuid");
-            entity.Property(e => e.IsOwner)
-                .HasColumnType("tinyint(4)")
-                .HasColumnName("is_owner");
-
-            entity.HasOne(d => d.Plot).WithMany(p => p.BuilderHasPlots)
-                .HasForeignKey(d => d.PlotId)
-                .HasConstraintName("builder_has_plot_ibfk_1");
-
-            entity.HasOne(d => d.Uu).WithMany(p => p.BuilderHasPlots)
-                .HasForeignKey(d => d.Uuid)
-                .HasConstraintName("builder_has_plot_ibfk_2");
-        });
-
         modelBuilder.Entity<CityProject>(entity =>
         {
             entity.HasKey(e => e.CityProjectId).HasName("PRIMARY");
 
             entity.ToTable("city_project");
 
+            entity.HasIndex(e => e.BuildTeamId, "build_team_id");
+
             entity.HasIndex(e => e.CountryCode, "country_code");
 
             entity.HasIndex(e => e.ServerName, "server_name");
 
             entity.Property(e => e.CityProjectId).HasColumnName("city_project_id");
+            entity.Property(e => e.BuildTeamId)
+                .HasColumnType("int(11)")
+                .HasColumnName("build_team_id");
             entity.Property(e => e.CountryCode)
                 .HasMaxLength(2)
                 .HasColumnName("country_code");
             entity.Property(e => e.IsVisible)
+                .IsRequired()
                 .HasDefaultValueSql("'1'")
-                .HasColumnType("tinyint(4)")
                 .HasColumnName("is_visible");
             entity.Property(e => e.ServerName).HasColumnName("server_name");
+
+            entity.HasOne(d => d.BuildTeam).WithMany(p => p.CityProjects)
+                .HasForeignKey(d => d.BuildTeamId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("city_project_ibfk_1");
 
             entity.HasOne(d => d.CountryCodeNavigation).WithMany(p => p.CityProjects)
                 .HasForeignKey(d => d.CountryCode)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("city_project_ibfk_1");
+                .HasConstraintName("city_project_ibfk_2");
 
             entity.HasOne(d => d.ServerNameNavigation).WithMany(p => p.CityProjects)
                 .HasPrincipalKey(p => p.ServerName)
                 .HasForeignKey(d => d.ServerName)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("city_project_ibfk_2");
+                .HasConstraintName("city_project_ibfk_3");
         });
 
         modelBuilder.Entity<Country>(entity =>
@@ -254,6 +208,8 @@ public partial class PlotSystemContext : DbContext
 
             entity.HasIndex(e => e.DifficultyId, "difficulty_id");
 
+            entity.HasIndex(e => e.OwnerUuid, "owner_uuid");
+
             entity.Property(e => e.PlotId)
                 .HasColumnType("int(11)")
                 .HasColumnName("plot_id");
@@ -272,9 +228,7 @@ public partial class PlotSystemContext : DbContext
             entity.Property(e => e.InitialSchematic)
                 .HasColumnType("mediumblob")
                 .HasColumnName("initial_schematic");
-            entity.Property(e => e.IsPasted)
-                .HasColumnType("tinyint(4)")
-                .HasColumnName("is_pasted");
+            entity.Property(e => e.IsPasted).HasColumnName("is_pasted");
             entity.Property(e => e.LastActivityDate)
                 .HasColumnType("datetime")
                 .HasColumnName("last_activity_date");
@@ -284,6 +238,12 @@ public partial class PlotSystemContext : DbContext
             entity.Property(e => e.OutlineBounds)
                 .HasColumnType("text")
                 .HasColumnName("outline_bounds");
+            entity.Property(e => e.OwnerUuid)
+                .HasMaxLength(36)
+                .HasColumnName("owner_uuid");
+            entity.Property(e => e.PlotType)
+                .HasColumnType("int(11)")
+                .HasColumnName("plot_type");
             entity.Property(e => e.PlotVersion).HasColumnName("plot_version");
             entity.Property(e => e.Score)
                 .HasColumnType("int(11)")
@@ -302,6 +262,34 @@ public partial class PlotSystemContext : DbContext
                 .HasForeignKey(d => d.DifficultyId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("plot_ibfk_2");
+
+            entity.HasOne(d => d.OwnerUu).WithMany(p => p.PlotsNavigation)
+                .HasForeignKey(d => d.OwnerUuid)
+                .HasConstraintName("plot_ibfk_3");
+
+            entity.HasMany(d => d.Uus).WithMany(p => p.Plots)
+                .UsingEntity<Dictionary<string, object>>(
+                    "BuilderIsPlotMember",
+                    r => r.HasOne<Builder>().WithMany()
+                        .HasForeignKey("Uuid")
+                        .HasConstraintName("builder_is_plot_member_ibfk_2"),
+                    l => l.HasOne<Plot>().WithMany()
+                        .HasForeignKey("PlotId")
+                        .HasConstraintName("builder_is_plot_member_ibfk_1"),
+                    j =>
+                    {
+                        j.HasKey("PlotId", "Uuid")
+                            .HasName("PRIMARY")
+                            .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
+                        j.ToTable("builder_is_plot_member");
+                        j.HasIndex(new[] { "Uuid" }, "uuid");
+                        j.IndexerProperty<int>("PlotId")
+                            .HasColumnType("int(11)")
+                            .HasColumnName("plot_id");
+                        j.IndexerProperty<string>("Uuid")
+                            .HasMaxLength(36)
+                            .HasColumnName("uuid");
+                    });
         });
 
         modelBuilder.Entity<PlotDifficulty>(entity =>
@@ -353,6 +341,28 @@ public partial class PlotSystemContext : DbContext
                 .HasForeignKey(d => d.PlotId)
                 .HasConstraintName("plot_review_ibfk_1");
 
+            entity.HasMany(d => d.CriteriaNames).WithMany(p => p.Reviews)
+                .UsingEntity<Dictionary<string, object>>(
+                    "ReviewContainsToggleCriterion",
+                    r => r.HasOne<ReviewToggleCriterion>().WithMany()
+                        .HasForeignKey("CriteriaName")
+                        .HasConstraintName("review_contains_toggle_criteria_ibfk_2"),
+                    l => l.HasOne<PlotReview>().WithMany()
+                        .HasForeignKey("ReviewId")
+                        .HasConstraintName("review_contains_toggle_criteria_ibfk_1"),
+                    j =>
+                    {
+                        j.HasKey("ReviewId", "CriteriaName")
+                            .HasName("PRIMARY")
+                            .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
+                        j.ToTable("review_contains_toggle_criteria");
+                        j.HasIndex(new[] { "CriteriaName" }, "criteria_name");
+                        j.IndexerProperty<int>("ReviewId")
+                            .HasColumnType("int(11)")
+                            .HasColumnName("review_id");
+                        j.IndexerProperty<string>("CriteriaName").HasColumnName("criteria_name");
+                    });
+
             entity.HasMany(d => d.Uus).WithMany(p => p.Reviews)
                 .UsingEntity<Dictionary<string, object>>(
                     "BuilderHasReviewNotification",
@@ -376,6 +386,16 @@ public partial class PlotSystemContext : DbContext
                             .HasMaxLength(36)
                             .HasColumnName("uuid");
                     });
+        });
+
+        modelBuilder.Entity<ReviewToggleCriterion>(entity =>
+        {
+            entity.HasKey(e => e.CriteriaName).HasName("PRIMARY");
+
+            entity.ToTable("review_toggle_criteria");
+
+            entity.Property(e => e.CriteriaName).HasColumnName("criteria_name");
+            entity.Property(e => e.IsOptional).HasColumnName("is_optional");
         });
 
         modelBuilder.Entity<Server>(entity =>
@@ -438,9 +458,7 @@ public partial class PlotSystemContext : DbContext
                 .HasDefaultValueSql("current_timestamp()")
                 .HasColumnType("datetime")
                 .HasColumnName("first_stage_start_date");
-            entity.Property(e => e.IsComplete)
-                .HasColumnType("tinyint(4)")
-                .HasColumnName("is_complete");
+            entity.Property(e => e.IsComplete).HasColumnName("is_complete");
             entity.Property(e => e.LastStageCompleteDate)
                 .HasColumnType("datetime")
                 .HasColumnName("last_stage_complete_date");

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace PlotSystem_API.Models;
+﻿namespace PlotSystem_API.Models;
 
 public partial class Tutorial
 {
@@ -11,7 +8,7 @@ public partial class Tutorial
 
     public int StageId { get; set; }
 
-    public sbyte IsComplete { get; set; }
+    public bool IsComplete { get; set; }
 
     public DateTime FirstStageStartDate { get; set; }
 

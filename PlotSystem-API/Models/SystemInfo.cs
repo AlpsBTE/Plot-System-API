@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace PlotSystem_API.Models;
+﻿namespace PlotSystem_API.Models;
 
 public partial class SystemInfo
 {
@@ -12,6 +9,6 @@ public partial class SystemInfo
     public double CurrentPlotVersion { get; set; }
 
     public DateTime LastUpdate { get; set; }
-
+    
     public string? Description { get; set; }
 }

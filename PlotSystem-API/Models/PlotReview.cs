@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace PlotSystem_API.Models;
+﻿namespace PlotSystem_API.Models;
 
 public partial class PlotReview
 {
@@ -18,6 +15,8 @@ public partial class PlotReview
     public DateTime ReviewDate { get; set; }
 
     public virtual Plot Plot { get; set; } = null!;
+
+    public virtual ICollection<ReviewToggleCriterion> CriteriaNames { get; set; } = new List<ReviewToggleCriterion>();
 
     public virtual ICollection<Builder> Uus { get; set; } = new List<Builder>();
 }

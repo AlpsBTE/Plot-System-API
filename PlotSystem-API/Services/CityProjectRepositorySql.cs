@@ -8,8 +8,9 @@ public class CityProjectRepositorySql(PlotSystemContext context) : ICityProjectR
 {
     public List<CityProjectDto> GetCityProjects(BuildTeam buildTeam)
     {
+        
         var cities = context.CityProjects
-            .Where(c => c.BuildTeams.FirstOrDefault(b => b.BuildTeamId == buildTeam.BuildTeamId) != null)
+            .Where(c => c.BuildTeamId == buildTeam.BuildTeamId)
             .Include(cityProject => cityProject.CountryCodeNavigation)
             .ToList();
         

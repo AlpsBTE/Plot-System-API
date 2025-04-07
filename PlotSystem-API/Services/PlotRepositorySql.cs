@@ -33,7 +33,7 @@ namespace PlotSystem_API.Services
                 InitialSchematic = initialSchematic,
                 PlotVersion = plotVersion
             };
-            var entity = context.Plots.Add(newPlot);
+            _ = context.Plots.Add(newPlot);
             context.SaveChanges();
             var newPlotId = newPlot.PlotId;
             
