@@ -21,7 +21,7 @@ public class ApiKeyMiddleware(RequestDelegate next)
             return;
         }
         
-        var buildTeam = await dbContext.BuildTeams.FirstOrDefaultAsync(b => apiKey.First() == apiKey);
+        var buildTeam = await dbContext.BuildTeams.FirstOrDefaultAsync(b => apiKey.First() == b.ApiKey);
 
         if (buildTeam == null)
         {
