@@ -1,7 +1,10 @@
+using dotenv.net;
 using Microsoft.EntityFrameworkCore;
 using PlotSystem_API;
 using PlotSystem_API.Models;
 using PlotSystem_API.Services;
+
+DotEnv.Load(); // Load environment variables from .env file
 
 var builder = WebApplication.CreateBuilder(args);
 
