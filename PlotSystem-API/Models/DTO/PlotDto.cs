@@ -9,4 +9,6 @@ public class PlotDto
     public required double PlotVersion { get; set; }
     public string? McVersion { get; set; }
     public byte[]? CompletedSchematic { get; set; }
+    public string? OwnerUuid { get; set; }
+    public required string CreatedByUuid { get; set; }
 }

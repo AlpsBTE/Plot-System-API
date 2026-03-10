@@ -17,7 +17,9 @@ namespace PlotSystem_API.Services
                     Status = plot.Status,
                     McVersion = plot.McVersion,
                     PlotVersion = plot.PlotVersion,
-                    CompletedSchematic = plot.CompleteSchematic
+                    CompletedSchematic = plot.CompleteSchematic,
+                    OwnerUuid = plot.OwnerUuid,
+                    CreatedByUuid = plot.CreatedBy
                 };
         }
 
@@ -31,7 +33,7 @@ namespace PlotSystem_API.Services
                 OutlineBounds = outlineBounds,
                 CreatedBy = createPlayerUuid,
                 InitialSchematic = initialSchematic,
-                PlotVersion = plotVersion
+                PlotVersion = plotVersion,
             };
             _ = context.Plots.Add(newPlot);
             context.SaveChanges();
@@ -42,7 +44,8 @@ namespace PlotSystem_API.Services
                 Id = newPlotId,
                 CityProjectId = newPlot.CityProjectId,
                 Status = newPlot.Status,
-                PlotVersion = newPlot.PlotVersion
+                PlotVersion = newPlot.PlotVersion,
+                CreatedByUuid = newPlot.CreatedBy
             };
         }
 
@@ -68,7 +71,9 @@ namespace PlotSystem_API.Services
                     Status = plot.Status,
                     McVersion = plot.McVersion,
                     PlotVersion = plot.PlotVersion,
-                    CompletedSchematic = plot.CompleteSchematic
+                    CompletedSchematic = plot.CompleteSchematic,
+                    CreatedByUuid = plot.CreatedBy,
+                    OwnerUuid = plot.OwnerUuid
                 })
                 .ToList();
         }
